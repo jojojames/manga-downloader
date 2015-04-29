@@ -233,7 +233,7 @@ function mangafox_download_chapter()
 		url="http://$base/manga/$manganame/v$volumenum/c$chapternum/$pagenum.html"
 		rm -f temporary.html
 		download $url "temporary.html"
-		if [ ! -e temporary.html ]
+		if [ ! -s temporary.html ]
 		then
 			curlreturn=1
 		fi
