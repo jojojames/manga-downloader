@@ -271,7 +271,6 @@ function mangafox_download_chapter()
 			fi
 		else
 			echo "All pages (`expr $pagenum - 1`) of chapter #$chapternum downloaded"
-			pagenum=1
 		fi
 	done
 	curlreturn=0
@@ -394,7 +393,6 @@ else
 			cd $manganame
 			volumenum=`echo $url | cut -d / -f 6 | cut -d v -f 2`
 			chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
-			pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 			found=0
 		elif [ `echo $url | grep -E ^https?://mangafox.me/manga/[^/]*` ]
 		then
