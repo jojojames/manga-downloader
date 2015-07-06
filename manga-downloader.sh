@@ -7,6 +7,11 @@ function imgurl_firstimgtag()
 	imgurl=`cat temporary.html | awk '{split($0,a,"<img");$1=a[2];print $1}' | awk '{split($0,a,"src=\"");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[1];print $1}'`
 }
 
+function imgurl_firstimgtag_class_open()
+{
+	imgurl=`cat temporary.html | awk '{split($0,a,"<img class=\"open\"");$1=a[2];print $1}' | awk '{split($0,a,"src=\"");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[1];print $1}'`
+}
+
 function imgurl_filter_manganame()
 {
 	imgurl=`echo $imgurl | grep $manganame`
@@ -274,6 +279,64 @@ function mangafox_download_chapter()
 	cd ../..
 }
 
+function juinjutsuteam_download_chapter()
+{
+	if [ ! -d `echo v$volumenum` ]
+	then
+		mkdir `echo v$volumenum`
+	fi
+	cd `echo v$volumenum`
+	if [ ! -d `echo c$chapternum` ]
+	then
+		mkdir `echo c$chapternum`
+	fi
+	cd `echo c$chapternum`
+	echo "Downloading chapter $chapternum of volume $volumenum"
+	curlreturn=0
+	while [ $curlreturn -eq 0 ]
+	do
+		url="http://$base/read/$manganame/$lang/$volumenum/$chapternum/page/$pagenum"
+		rm -f temporary.html
+		download $url "temporary.html"
+		if [ ! -s temporary.html ]
+		then
+			curlreturn=1
+		fi
+		if [ $curlreturn -eq 0 ]
+		then
+			$imgurl_get
+			rm -f temporary.html
+			if [ -z $imgurl ]
+			then
+				rm -f temporary.html
+			fi
+			if [ $pagenum -lt 100 ]
+				then
+				if [ $pagenum -lt 10 ]
+				then
+					download $imgurl "page-00$pagenum.jpg"
+				else
+					download $imgurl "page-0$pagenum.jpg"
+				fi
+			else
+				download $imgurl "page-$pagenum.jpg"
+			fi
+			if [ $curlreturn -ne 0 ]
+			then
+				error_imgurl
+			else
+				echo "Page #$pagenum of chapter #$chapternum downloaded"
+				pagenum=`expr $pagenum + 1`
+			fi
+		else
+			echo "All pages (`expr $pagenum - 1`) of chapter #$chapternum downloaded"
+		fi
+	done
+	curlreturn=0
+	rm -f temporary.html
+	cd ../..
+}
+
 url=$1
 if [ ! $url ]
 then
@@ -366,6 +429,55 @@ else
 				chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
 				pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 				mangafox_download_chapter
+			fi
+		done
+		rm -f temporary.html
+		;;
+	"juinjutsuteam.netsons.org")
+		imgurl_get="imgurl_firstimgtag_class_open"
+		if [ `echo $url | grep -E ^https?://juinjutsuteam\.netsons\.org/read/[^/]*/[^/]*/[0-9]*/[0-9]*` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			lang=`echo $url | cut -d / -f 6`
+			volumenum=`echo $url | cut -d / -f 7`
+			chapternum=`echo $url | cut -d / -f 8`
+			found=0
+		elif [ `echo $url | grep -E ^https?://juinjutsuteam\.netsons\.org/series/[^/]]*` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			found=1
+		else
+			error_url
+		fi
+		echo "Retrieving URL list..."
+		rm -f temporary.html
+		download "http://juinjutsuteam.netsons.org/series/$manganame" "temporary.html"
+		echo "done"
+		echo "Catching up to desired chapter..."
+		grep -E href\=\"https?://juinjutsuteam\.netsons\.org/read/[^/]*/[^/]*/[0-9]*/[0-9]*/\" temporary.html > temporary2.html
+		cut -d \" -f 4 temporary2.html > temporary.html
+		rm -f temporary2.html
+		for word in `tac temporary.html`
+		do
+			if [ $found -ne 1 ]
+			then
+				if [ `echo $word | grep -E https?://juinjutsuteam\.netsons\.org/read/$manganame/$lang/$volumenum/$chapternum` ]
+				then
+					found=1
+				fi
+			fi
+			if [ $found -eq 1 ]
+			then
+				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
+				lang=`echo $url | cut -d / -f 6`
+				volumenum=`echo $url | cut -d / -f 7`
+				chapternum=`echo $url | cut -d / -f 8`
+				pagenum=1
+				juinjutsuteam_download_chapter
 			fi
 		done
 		rm -f temporary.html

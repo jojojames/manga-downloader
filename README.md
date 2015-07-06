@@ -32,6 +32,8 @@ mangapanda.com
 
 mangafox.me
 
+juinjutsuteam.netsons.org
+
 If you want another site to be supported, please file a bug report.
 
 Happy reading!
