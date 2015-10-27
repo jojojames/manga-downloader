@@ -22,6 +22,11 @@ function imgurl_filter_firstresult()
 	imgurl=`echo $imgurl | grep http | head -n 1 | cut -d ' ' -f 1`
 }
 
+function imgurl_filter_secondresult()
+{
+	imgurl=`echo $imgurl | grep http | cut -d ' ' -f 2`
+}
+
 function error_imgurl()
 {
 	echo "This shouldn't happen. Please try again and if it still fails, report a bug at github.com/briefbanane/manga-downloader"
@@ -403,7 +408,7 @@ else
 		;;
 	"mangafox.me")
 		imgurl_get="imgurl_firstimgtag"
-		imgurl_filter="imgurl_filter_firstresult"
+		imgurl_filter="imgurl_filter_secondresult"
 		if [ `echo $url | grep -E ^https?://mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
