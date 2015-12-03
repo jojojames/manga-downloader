@@ -408,7 +408,7 @@ else
 		;;
 	"mangafox.me")
 		imgurl_get="imgurl_firstimgtag"
-		imgurl_filter="imgurl_filter_secondresult"
+		imgurl_filter="imgurl_filter_firstresult"
 		if [ `echo $url | grep -E ^https?://mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
