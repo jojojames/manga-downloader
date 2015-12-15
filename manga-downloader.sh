@@ -51,6 +51,30 @@ function download()
 	done
 }
 
+function download_image()
+{
+	size=0
+	while [ $size -lt 1000 ]
+	do
+		curlreturn=18
+		while [ $curlreturn -eq 18 ]
+		do
+			curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 $1 -o $2 -C -
+			curlreturn=$?
+		done
+		if [ ! -e $2 ]
+		then
+			size=0
+		else
+			size=`stat -c %s $2`
+		fi
+		if [ $size -lt 1000 ]
+		then
+			echo "Image size too small or other problem, redownloading"
+		fi
+	done
+}
+
 function base_manganame_chapternum_pagenum_downloader()
 {
 	mkdir -p $manganame
@@ -273,12 +297,12 @@ function mangafox_download_chapter()
 				then
 				if [ $pagenum -lt 10 ]
 				then
-					download $imgurl "page-00$pagenum.jpg"
+					download_image $imgurl "page-00$pagenum.jpg"
 				else
-					download $imgurl "page-0$pagenum.jpg"
+					download_image $imgurl "page-0$pagenum.jpg"
 				fi
 			else
-				download $imgurl "page-$pagenum.jpg"
+				download_image $imgurl "page-$pagenum.jpg"
 			fi
 			if [ $curlreturn -ne 0 ]
 			then
