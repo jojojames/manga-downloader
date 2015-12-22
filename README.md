@@ -16,6 +16,8 @@ The script will create following directory structure:
 directory-where-you-ran-the-script/manga-name/chapter-xxx/page-xxx.jpg
 or
 directory-where-you-ran-the-script/manga-name/vxx/cxxx/page-xxx.jpg
+or
+directory-where-you-ran-the-script/manga-name/cxxx/page-xxx.jpg
 
 bundle-dirs
 -----------
@@ -31,6 +33,8 @@ mangareader.net
 mangapanda.com
 
 mangafox.me
+
+www.mangahere.co
 
 juinjutsuteam.netsons.org
 

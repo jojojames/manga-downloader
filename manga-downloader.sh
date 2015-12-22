@@ -248,6 +248,88 @@ function base_manga_manganame_vvolumenum_cchapternum_pagenum_html_downloader()
 	done
 }
 
+function mangahere_download_chapter()
+{
+	if [ $novolume -ne 1 ]
+	then
+		if [ ! -d `echo v$volumenum` ]
+		then
+			mkdir `echo v$volumenum`
+		fi
+		cd `echo v$volumenum`
+	fi
+	if [ ! -d `echo c$chapternum` ]
+	then
+		mkdir `echo c$chapternum`
+	fi
+	cd `echo c$chapternum`
+	if [ $novolume -ne 1 ]
+	then
+		echo "Downloading chapter $chapternum of volume $volumenum"
+	else
+		echo "Downloading chapter $chapternum"
+	fi
+	curlreturn=0
+	while [ $curlreturn -eq 0 ]
+	do
+		if [ $novolume -ne 1 ]
+		then
+			url="http://$base/manga/$manganame/v$volumenum/c$chapternum/$pagenum.html"
+		else
+			url="http://$base/manga/$manganame/c$chapternum/$pagenum.html"
+		fi
+		if [ $pagenum -eq 1 ]
+		then
+			url="`echo $url | rev | cut -d / -f 2- | rev`/"
+		fi
+		rm -f temporary.html
+		download $url "temporary.html"
+		notfound=`grep class=\"error_404\" temporary.html | wc -l`
+		if [ ! -s temporary.html -o $notfound -ne 0 ]
+		then
+			curlreturn=1
+		fi
+		if [ $curlreturn -eq 0 ]
+		then
+			$imgurl_get
+			$imgurl_filter
+			rm -f temporary.html
+			if [ -z $imgurl ]
+			then
+				rm -f temporary.html
+			fi
+			if [ $pagenum -lt 100 ]
+				then
+				if [ $pagenum -lt 10 ]
+				then
+					download_image $imgurl "page-00$pagenum.jpg"
+				else
+					download_image $imgurl "page-0$pagenum.jpg"
+				fi
+			else
+				download_image $imgurl "page-$pagenum.jpg"
+			fi
+			if [ $curlreturn -ne 0 ]
+			then
+				error_imgurl
+			else
+				echo "Page #$pagenum of chapter #$chapternum downloaded"
+				pagenum=`expr $pagenum + 1`
+			fi
+		else
+			echo "All pages (`expr $pagenum - 1`) of chapter #$chapternum downloaded"
+		fi
+	done
+	curlreturn=0
+	rm -f temporary.html
+	if [ $novolume -ne 1 ]
+	then
+		cd ../..
+	else
+		cd ..
+	fi
+}
+
 function mangafox_download_chapter()
 {
 	if [ $novolume -ne 1 ]
@@ -489,6 +571,68 @@ else
 					pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 				fi
 				mangafox_download_chapter
+			fi
+		done
+		rm -f temporary.html
+		;;
+	"www.mangahere.co")
+		imgurl_get="imgurl_firstimgtag"
+		imgurl_filter="imgurl_filter_secondresult"
+		if [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
+			found=0
+		elif [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/v[^/]*/c[^/]*/[0-9]*\.html` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			volumenum=`echo $url | cut -d / -f 6 | cut -d v -f 2`
+			chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
+			found=0
+		elif [ `echo $url | grep -E ^https?://www\.mangahere.co/manga/[^/]*` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			found=1
+		else
+			error_url
+		fi
+		echo "Retrieving URL list..."
+		rm -f temporary.html
+		download "`echo $url | cut -d / -f 1-5`/" "temporary.html"
+		echo "done"
+		echo "Catching up to desired chapter..."
+		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" temporary.html > temporary2.html
+		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print $1"1.html"}' > temporary.html
+		for word in `tac temporary.html`
+		do
+			if [ $found -ne 1 ]
+			then
+				if [ `echo $word | grep -E https?://www\.mangahere\.co/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
+				then
+					found=1
+				fi
+			fi
+			if [ $found -eq 1 ]
+			then
+				novolume=0
+				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
+				if [ `echo $url | grep -E https?://www\.mangahere\.co/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+				then
+					novolume=1
+					chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
+					pagenum=`echo $url | cut -d / -f 7 | cut -d . -f 1`
+				else
+					volumenum=`echo $url | cut -d / -f 6 | cut -d v -f 2`
+					chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
+					pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
+				fi
+				mangahere_download_chapter
 			fi
 		done
 		rm -f temporary.html
