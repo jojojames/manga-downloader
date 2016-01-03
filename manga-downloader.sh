@@ -53,8 +53,8 @@ function download()
 
 function download_image()
 {
-	size=0
-	while [ $size -lt 1000 ]
+	fail=1
+	while [ $fail -ne 0 ]
 	do
 		curlreturn=18
 		while [ $curlreturn -eq 18 ]
@@ -64,13 +64,14 @@ function download_image()
 		done
 		if [ ! -e $2 ]
 		then
-			size=0
+			fail=1
 		else
-			size=`stat -c %s $2`
+			fail=`file $2 | grep -v image | wc -l`
 		fi
-		if [ $size -lt 1000 ]
+		if [ $fail -ne 0 ]
 		then
-			echo "Image size too small or other problem, redownloading"
+			echo "Download not successful, trying again"
+			rm $2
 		fi
 	done
 }
