@@ -1,5 +1,5 @@
 #!/bin/bash
-#Copyright 2013-2015 Fabian Ebner
+#Copyright 2013-2016 Fabian Ebner
 #Published under the GPLv3 or any later version, see the file COPYING for details
 
 function imgurl_firstimgtag()
