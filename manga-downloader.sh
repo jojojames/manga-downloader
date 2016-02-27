@@ -610,6 +610,7 @@ else
 		echo "Catching up to desired chapter..."
 		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" temporary.html > temporary2.html
 		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print $1"1.html"}' > temporary.html
+		rm -f temporary2.html
 		for word in `tac temporary.html`
 		do
 			if [ $found -ne 1 ]
