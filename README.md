@@ -38,6 +38,8 @@ www.mangahere.co
 
 juinjutsuteam.netsons.org
 
+www.japscan.com
+
 If you want another site to be supported, please file a bug report.
 
 Happy reading!

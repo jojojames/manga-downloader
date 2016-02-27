@@ -41,6 +41,35 @@ function error_url()
 	exit 1
 }
 
+function japscan_recompose_image()
+{
+	width=`identify -ping -format '%w' $1`
+	height=`identify -ping -format '%h' $1`
+	width=`expr \( $width / 5 \) \* 5`
+	height=`expr \( $height / 5 \) \* 5`
+	convert $1 -crop "$width"x"$height"+0+0 multoffive.jpg
+	convert multoffive.jpg -crop 20x20% part.jpg
+	i=0
+	while [ $i -ne 25 ]
+	do
+		num=$i
+		rem=`expr $num % 5`
+		case $rem in
+		0 | 2)
+			rem=`expr 2 - $rem`
+			;;
+		1 | 4)
+			rem=`expr 5 - $rem `
+			;;
+		esac
+		new=`expr 5 \* \( 4 - \( $num / 5 \) \) + $rem`
+		cp part-$i.jpg newpart-$new.jpg
+		i=`expr $i + 1`
+	done
+	montage `ls -v newpart-*` -tile 5x5 -geometry +0+0 $1
+	rm -f part* newpart* multoffive.jpg
+}
+
 function download()
 {
 	curlreturn=18
@@ -59,7 +88,7 @@ function download_image()
 		curlreturn=18
 		while [ $curlreturn -eq 18 ]
 		do
-			curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 $1 -o $2 -C -
+			curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 "$1" -o $2 -C -
 			curlreturn=$?
 		done
 		if [ ! -e $2 ]
@@ -247,6 +276,57 @@ function base_manga_manganame_vvolumenum_cchapternum_pagenum_html_downloader()
 		rm -f temporary.html
 		cd ..
 	done
+}
+
+function japscan_download_chapter()
+{
+	if [ ! -d `echo $subcategory` ]
+	then
+		mkdir `echo $subcategory`
+	fi
+	cd `echo $subcategory`
+	echo "Downloading volume/chapter $subcategory"
+	url="http://$base/lecture-en-ligne/$manganame/$subcategory/1.html"
+	rm -f temporary2.html
+	download $url "temporary2.html"
+	nameid=`grep -E "<select" temporary2.html | grep -E "id\=\"mangas\"" | awk '{split($0,a,"data-nom=\"");print a[2]}' | cut -d \" -f 1`
+	if [ `grep -E "<select" temporary2.html | grep -E "id\=\"chapitres\"" | grep -E "data-nom" | wc -l` -eq 0 ]
+	then
+		subid=`grep -E "<select" temporary2.html | grep -E "id\=\"chapitres\"" | awk '{split($0,a,"data-uri=\"");print a[2]}' | cut -d \" -f 1`
+	else
+		subid=`grep -E "<select" temporary2.html | grep -E "id\=\"chapitres\"" | awk '{split($0,a,"data-nom=\"");print a[2]}' | cut -d \" -f 1`
+	fi
+	pagenum=1
+	grep -E "<option" temporary2.html > temporary.html
+	rm -f temporary2.html
+	cat temporary.html | while read line
+	do
+		imgid=`echo $line | awk '{split($0,a,"data-img=\"");print a[2]}' | cut -d \" -f 1`
+		imgurl="http://cdn.japscan.com/cr-images/$nameid/$subid/$imgid"
+		download_image "$imgurl" "scrambled.jpg"
+		if [ $curlreturn -ne 0 ]
+		then
+			error_imgurl
+		else
+			japscan_recompose_image "scrambled.jpg"
+			if [ $pagenum -lt 100 ]
+				then
+				if [ $pagenum -lt 10 ]
+				then
+					mv "scrambled.jpg" "page-00$pagenum.jpg"
+				else
+					mv "scrambled.jpg" "page-0$pagenum.jpg"
+				fi
+			else
+				mv "scrambled.jpg" "page-$pagenum.jpg"
+			fi
+			echo "Page #$pagenum of chapter/volume #$subcategory downloaded"
+			pagenum=`expr $pagenum + 1`
+		fi
+	done
+	echo "All pages (`expr $pagenum - 1`) of chapter/volume #$subcategory downloaded"
+	rm -f temporary.html
+	cd ..
 }
 
 function mangahere_download_chapter()
@@ -635,6 +715,50 @@ else
 					pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 				fi
 				mangahere_download_chapter
+			fi
+		done
+		rm -f temporary.html
+		;;
+	"www.japscan.com")
+		if [ `echo $url | grep -E ^https?://www\.japscan\.com/lecture-en-ligne/[^/]*/[^/]*/` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			subcategory=`echo $url | cut -d / -f 6`
+			found=0
+		elif [ `echo $url | grep -E ^https?://www\.japscan\.com/mangas/[^/]*/` ]
+		then
+			manganame=`echo $url | cut -d / -f 5`
+			mkdir -p $manganame
+			cd $manganame
+			found=1
+		else
+			error_url
+		fi
+		echo "Retrieving URL list..."
+		rm -f temporary2.html
+		download "`echo $url | cut -d / -f 1-3`/mangas/$manganame/" "temporary2.html"
+		sed 's/<a/\n&/g' temporary2.html > temporary.html
+		echo "done"
+		echo "Catching up to desired chapter..."
+		grep -E href\=\"//www\.japscan\.com/lecture-en-ligne/$manganame/[^/]*/\" temporary.html > temporary2.html
+		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print "http:"$1"1.html"}' > temporary.html
+		rm -f temporary2.html
+		for word in `tac temporary.html`
+		do
+			if [ $found -ne 1 ]
+			then
+				if [ `echo $word | grep -E https?://www\.japscan\.com/lecture-en-ligne/[^/]*/$subcategory/[0-9]*\.html` ]
+				then
+					found=1
+				fi
+			fi
+			if [ $found -eq 1 ]
+			then
+				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
+				subcategory=`echo $url | cut -d / -f 6`
+				japscan_download_chapter
 			fi
 		done
 		rm -f temporary.html
