@@ -2,6 +2,11 @@
 #Copyright 2013-2016 Fabian Ebner
 #Published under the GPLv3 or any later version, see the file COPYING for details
 
+function tac_awk()
+{
+	cat $1 | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'
+}
+
 function imgurl_firstimgtag()
 {
 	imgurl=`cat temporary.html | awk '{split($0,a,"<img");$1=a[2];print $1}' | awk '{split($0,a,"src=\"");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[1];print $1}'`
@@ -628,7 +633,7 @@ else
 		grep -E href\=\"https?://mangafox\.me/manga/[^/]*/?v?[^/]*/c[^/]*/[0-9]*\.html\" temporary.html > temporary2.html
 		cut -d \" -f 2 temporary2.html > temporary.html
 		rm -f temporary2.html
-		for word in `tac temporary.html`
+		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
@@ -691,7 +696,7 @@ else
 		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" temporary.html > temporary2.html
 		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print $1"1.html"}' > temporary.html
 		rm -f temporary2.html
-		for word in `tac temporary.html`
+		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
@@ -745,7 +750,7 @@ else
 		grep -E href\=\"//www\.japscan\.com/lecture-en-ligne/$manganame/[^/]*/\" temporary.html > temporary2.html
 		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print "http:"$1"1.html"}' > temporary.html
 		rm -f temporary2.html
-		for word in `tac temporary.html`
+		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
@@ -791,7 +796,7 @@ else
 		grep -E href\=\"https?://juinjutsuteam\.netsons\.org/read/[^/]*/[^/]*/[0-9]*/[0-9]*/\" temporary.html > temporary2.html
 		cut -d \" -f 4 temporary2.html > temporary.html
 		rm -f temporary2.html
-		for word in `tac temporary.html`
+		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
