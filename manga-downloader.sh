@@ -744,7 +744,8 @@ else
 		echo "Retrieving URL list..."
 		rm -f temporary2.html
 		download "`echo $url | cut -d / -f 1-3`/mangas/$manganame/" "temporary2.html"
-		sed 's/<a/\n&/g' temporary2.html > temporary.html
+		sed 's/<a/\
+<a/g' temporary2.html > temporary.html
 		echo "done"
 		echo "Catching up to desired chapter..."
 		grep -E href\=\"//www\.japscan\.com/lecture-en-ligne/$manganame/[^/]*/\" temporary.html > temporary2.html
