@@ -38,7 +38,7 @@ www.mangahere.co
 
 juinjutsuteam.netsons.org
 
-www.japscan.com (ImageMagick must be installed)
+www.japscan.com (ImageMagick and Ghostscript must be installed)
 
 If you want another site to be supported, please file a bug report.
 
