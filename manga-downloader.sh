@@ -71,7 +71,7 @@ function japscan_recompose_image()
 		cp part-$i.jpg newpart-$new.jpg
 		i=`expr $i + 1`
 	done
-	montage `ls -v newpart-*` -tile 5x5 -geometry +0+0 $1
+	montage newpart-{0..24}.jpg -tile 5x5 -geometry +0+0 $1
 	rm -f part* newpart* multoffive.jpg
 }
 
