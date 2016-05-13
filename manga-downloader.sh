@@ -693,7 +693,8 @@ else
 		download "`echo $url | cut -d / -f 1-5`/" "temporary.html"
 		echo "done"
 		echo "Catching up to desired chapter..."
-		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" temporary.html > temporary2.html
+		grep -v \<label\>Status\: temporary.html |
+		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" > temporary2.html
 		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print $1"1.html"}' > temporary.html
 		rm -f temporary2.html
 		for word in `tac_awk temporary.html`
