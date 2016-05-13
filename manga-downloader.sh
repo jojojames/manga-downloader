@@ -664,14 +664,14 @@ else
 	"www.mangahere.co")
 		imgurl_get="imgurl_firstimgtag"
 		imgurl_filter="imgurl_filter_secondresult"
-		if [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+		if [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/c[^/]*` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
 			mkdir -p $manganame
 			cd $manganame
 			chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
 			found=0
-		elif [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/v[^/]*/c[^/]*/[0-9]*\.html` ]
+		elif [ `echo $url | grep -E ^https?://www\.mangahere\.co/manga/[^/]*/v[^/]*/c[^/]*` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
 			mkdir -p $manganame
@@ -700,7 +700,7 @@ else
 		do
 			if [ $found -ne 1 ]
 			then
-				if [ `echo $word | grep -E https?://www\.mangahere\.co/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
+				if [ `echo $word | grep -E https?://www\.mangahere\.co/manga/[^/]*/?v?$volumenum/c$chapternum` ]
 				then
 					found=1
 				fi
@@ -708,16 +708,15 @@ else
 			if [ $found -eq 1 ]
 			then
 				novolume=0
+				pagenum=1
 				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
-				if [ `echo $url | grep -E https?://www\.mangahere\.co/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+				if [ `echo $url | grep -E https?://www\.mangahere\.co/manga/[^/]*/c[^/]*` ]
 				then
 					novolume=1
 					chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
-					pagenum=`echo $url | cut -d / -f 7 | cut -d . -f 1`
 				else
 					volumenum=`echo $url | cut -d / -f 6 | cut -d v -f 2`
 					chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
-					pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 				fi
 				mangahere_download_chapter
 			fi
