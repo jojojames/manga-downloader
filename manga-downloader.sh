@@ -80,7 +80,7 @@ function download()
 	curlreturn=18
 	while [ $curlreturn -eq 18 ]
 	do
-		curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 $1 -o $2 -C -
+		curl -g -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 $1 -o $2 -C -
 		curlreturn=$?
 	done
 }
@@ -93,7 +93,7 @@ function download_image()
 		curlreturn=18
 		while [ $curlreturn -eq 18 ]
 		do
-			curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 "$1" -o $2 -C -
+			curl -g -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:23.0)" --compressed --max-redirs 0 "$1" -o $2 -C -
 			curlreturn=$?
 		done
 		if [ ! -e $2 ]
