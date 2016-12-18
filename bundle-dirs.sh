@@ -4,6 +4,5 @@
 
 for dir in $@
 do
-	zip -r `echo $dir`.zip $dir
-	mv `echo $dir`.zip `echo $dir`.cbr
+	tar cf $dir.cbt $dir
 done

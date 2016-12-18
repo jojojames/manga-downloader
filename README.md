@@ -21,7 +21,7 @@ directory-where-you-ran-the-script/manga-name/cxxx/page-xxx.jpg
 
 bundle-dirs
 -----------
-With this script you can create cbr-files (really just a zip, but some document viewers require it to have the right suffix) out of directories.
+With this script you can create cbt-files out of directories.
 
 Just run bundle-dirs.sh directory-name1 directory-name2 etc.
 
