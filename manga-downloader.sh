@@ -630,14 +630,14 @@ else
 		download "`echo $url | cut -d / -f 1-5`" "temporary.html"
 		echo "done"
 		echo "Catching up to desired chapter..."
-		grep -E href\=\"https?://mangafox\.me/manga/[^/]*/?v?[^/]*/c[^/]*/[0-9]*\.html\" temporary.html > temporary2.html
+		grep -E href\=\"//mangafox\.me/manga/[^/]*/?v?[^/]*/c[^/]*/[0-9]*\.html\" temporary.html > temporary2.html
 		cut -d \" -f 2 temporary2.html > temporary.html
 		rm -f temporary2.html
 		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
-				if [ `echo $word | grep -E https?://mangafox\.me/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
+				if [ `echo $word | grep -E //mangafox\.me/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
 				then
 					found=1
 				fi
@@ -646,7 +646,7 @@ else
 			then
 				novolume=0
 				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
-				if [ `echo $url | grep -E https?://mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+				if [ `echo $url | grep -E //mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
 				then
 					novolume=1
 					chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
