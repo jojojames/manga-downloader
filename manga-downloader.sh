@@ -78,10 +78,24 @@ function japscan_recompose_image()
 function download()
 {
 	curlreturn=18
+	insecureflag=""
 	while [ $curlreturn -eq 18 ]
 	do
-		curl -g -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:55.0)" --compressed --max-redirs 0 $1 -o $2 -C -
+		curl $insecureflag -g -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:55.0)" --compressed --max-redirs 0 $1 -o $2 -C -
 		curlreturn=$?
+		if [ $curlreturn -eq 60 ]
+		then
+			read -r -p "Secure connection could not be authenticated. Use insecure connection? (Y/n): " rep
+			rep=${rep,,}
+			if [[ $rep =~ ^(yes|y| ) ]] || [[ -z $rep ]]
+			then
+				insecureflag="-k"
+				curlreturn=18
+			else
+				echo "Aborting"
+				exit 3
+			fi
+		fi
 	done
 }
 
