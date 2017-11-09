@@ -708,14 +708,14 @@ else
 		echo "done"
 		echo "Catching up to desired chapter..."
 		grep -v \<label\>Status\: temporary.html |
-		grep -E href\=\"https?://www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" > temporary2.html
+		grep -E href\=\"//www\.mangahere\.co/manga/$manganame/?v?[^/]*/c[^/]*/\" > temporary2.html
 		cat temporary2.html | awk '{split($0,a,"href");$1=a[2];print $1}' | awk '{split($0,a,"\"");$1=a[2];print $1"1.html"}' > temporary.html
 		rm -f temporary2.html
 		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
-				if [ `echo $word | grep -E https?://www\.mangahere\.co/manga/[^/]*/?v?$volumenum/c$chapternum` ]
+				if [ `echo $word | grep -E //www\.mangahere\.co/manga/[^/]*/?v?$volumenum/c$chapternum` ]
 				then
 					found=1
 				fi
@@ -725,7 +725,7 @@ else
 				novolume=0
 				pagenum=1
 				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
-				if [ `echo $url | grep -E https?://www\.mangahere\.co/manga/[^/]*/c[^/]*` ]
+				if [ `echo $url | grep -E //www\.mangahere\.co/manga/[^/]*/c[^/]*` ]
 				then
 					novolume=1
 					chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
