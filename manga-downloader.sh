@@ -321,7 +321,12 @@ function japscan_download_chapter()
 	cat temporary.html | while read line
 	do
 		imgid=`echo $line | awk '{split($0,a,"data-img=\"");print a[2]}' | cut -d \" -f 1`
-		imgurl="http://cdn.japscan.com/cr-images/$nameid/$subid/$imgid"
+		if [[ $imgid == IMG__* ]]
+		then
+			imgurl="http://ww1.japscan.com/img/lels/$imgid"
+		else
+			imgurl="http://ww1.japscan.com/lecture_en_ligne/$nameid/$subid/$imgid"
+		fi
 		download_image "$imgurl" "scrambled.jpg"
 		if [ $curlreturn -ne 0 ]
 		then
