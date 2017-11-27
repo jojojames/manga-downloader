@@ -46,35 +46,6 @@ function error_url()
 	exit 1
 }
 
-function japscan_recompose_image()
-{
-	width=`identify -ping -format '%w' $1`
-	height=`identify -ping -format '%h' $1`
-	width=`expr \( $width / 5 \) \* 5`
-	height=`expr \( $height / 5 \) \* 5`
-	convert $1 -crop "$width"x"$height"+0+0 multoffive.jpg
-	convert multoffive.jpg -crop 20x20% part.jpg
-	i=0
-	while [ $i -ne 25 ]
-	do
-		num=$i
-		rem=`expr $num % 5`
-		case $rem in
-		0 | 2)
-			rem=`expr 2 - $rem`
-			;;
-		1 | 4)
-			rem=`expr 5 - $rem `
-			;;
-		esac
-		new=`expr 5 \* \( 4 - \( $num / 5 \) \) + $rem`
-		cp part-$i.jpg newpart-$new.jpg
-		i=`expr $i + 1`
-	done
-	montage newpart-{0..24}.jpg -tile 5x5 -geometry +0+0 $1
-	rm -f part* newpart* multoffive.jpg
-}
-
 function download()
 {
 	curlreturn=18
@@ -327,22 +298,21 @@ function japscan_download_chapter()
 		else
 			imgurl="http://ww1.japscan.com/lecture_en_ligne/$nameid/$subid/$imgid"
 		fi
-		download_image "$imgurl" "scrambled.jpg"
+		download_image "$imgurl" "page.jpg"
 		if [ $curlreturn -ne 0 ]
 		then
 			error_imgurl
 		else
-			japscan_recompose_image "scrambled.jpg"
 			if [ $pagenum -lt 100 ]
 				then
 				if [ $pagenum -lt 10 ]
 				then
-					mv "scrambled.jpg" "page-00$pagenum.jpg"
+					mv "page.jpg" "page-00$pagenum.jpg"
 				else
-					mv "scrambled.jpg" "page-0$pagenum.jpg"
+					mv "page.jpg" "page-0$pagenum.jpg"
 				fi
 			else
-				mv "scrambled.jpg" "page-$pagenum.jpg"
+				mv "page.jpg" "page-$pagenum.jpg"
 			fi
 			echo "Page #$pagenum of chapter/volume #$subcategory downloaded"
 			pagenum=`expr $pagenum + 1`
