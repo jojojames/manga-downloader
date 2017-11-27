@@ -1,5 +1,5 @@
 #!/bin/bash
-#Copyright 2013-2016 Fabian Ebner
+#Copyright 2013-2017 Fabian Ebner and others
 #Published under the GPLv3 or any later version, see the file COPYING for details
 
 function tac_awk()
