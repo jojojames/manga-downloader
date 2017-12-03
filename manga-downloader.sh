@@ -280,6 +280,8 @@ function japscan_download_chapter()
 	rm -f temporary2.html
 	download $url "temporary2.html"
 	nameid=`grep -E "<select" temporary2.html | grep -E "id\=\"mangas\"" | awk '{split($0,a,"data-nom=\"");print a[2]}' | cut -d \" -f 1`
+	nameid=${nameid// /-}
+	nameid=${nameid//---/-}
 	if [ `grep -E "<select" temporary2.html | grep -E "id\=\"chapitres\"" | grep -E "data-nom" | wc -l` -eq 0 ]
 	then
 		subid=`grep -E "<select" temporary2.html | grep -E "id\=\"chapitres\"" | awk '{split($0,a,"data-uri=\"");print a[2]}' | cut -d \" -f 1`
@@ -296,7 +298,7 @@ function japscan_download_chapter()
 		then
 			imgurl="http://ww1.japscan.com/img/lels/$imgid"
 		else
-			imgurl="http://ww1.japscan.com/lecture_en_ligne/$nameid/$subid/$imgid"
+			imgurl="http://ww1.japscan.com/lel/$nameid/$subid/$imgid"
 		fi
 		download_image "$imgurl" "page.jpg"
 		if [ $curlreturn -ne 0 ]
@@ -806,6 +808,5 @@ else
 			fi
 		done
 		rm -f temporary.html
-		;;
 	esac
 fi
