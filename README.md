@@ -32,7 +32,7 @@ mangareader.net
 
 mangapanda.com
 
-mangafox.me
+fanfox.net (previously mangafox.me)
 
 www.mangahere.co
 
