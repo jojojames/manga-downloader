@@ -407,7 +407,7 @@ function mangahere_download_chapter()
 	fi
 }
 
-function mangafox_download_chapter()
+function fanfox_download_chapter()
 {
 	if [ $novolume -ne 1 ]
 	then
@@ -589,17 +589,17 @@ else
 		fi
 		base_manganame_chapternum_pagenum_downloader
 		;;
-	"mangafox.me")
+	"fanfox.net")
 		imgurl_get="imgurl_firstimgtag"
 		imgurl_filter="imgurl_filter_firstresult"
-		if [ `echo $url | grep -E ^https?://mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+		if [ `echo $url | grep -E ^https?://fanfox\.net/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
 			mkdir -p $manganame
 			cd $manganame
 			chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
 			found=0
-		elif [ `echo $url | grep -E ^https?://mangafox\.me/manga/[^/]*/v[^/]*/c[^/]*/[0-9]*\.html` ]
+		elif [ `echo $url | grep -E ^https?://fanfox\.net/manga/[^/]*/v[^/]*/c[^/]*/[0-9]*\.html` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
 			mkdir -p $manganame
@@ -607,7 +607,7 @@ else
 			volumenum=`echo $url | cut -d / -f 6 | cut -d v -f 2`
 			chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
 			found=0
-		elif [ `echo $url | grep -E ^https?://mangafox.me/manga/[^/]*` ]
+		elif [ `echo $url | grep -E ^https?://fanfox\.net/manga/[^/]*` ]
 		then
 			manganame=`echo $url | cut -d / -f 5`
 			mkdir -p $manganame
@@ -621,14 +621,14 @@ else
 		download "`echo $url | cut -d / -f 1-5`" "temporary.html"
 		echo "done"
 		echo "Catching up to desired chapter..."
-		grep -E href\=\"//mangafox\.me/manga/[^/]*/?v?[^/]*/c[^/]*/[0-9]*\.html\" temporary.html > temporary2.html
+		grep -E href\=\"//fanfox\.net/manga/[^/]*/?v?[^/]*/c[^/]*/[0-9]*\.html\" temporary.html > temporary2.html
 		cut -d \" -f 2 temporary2.html > temporary.html
 		rm -f temporary2.html
 		for word in `tac_awk temporary.html`
 		do
 			if [ $found -ne 1 ]
 			then
-				if [ `echo $word | grep -E //mangafox\.me/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
+				if [ `echo $word | grep -E //fanfox\.net/manga/[^/]*/?v?$volumenum/c$chapternum/[0-9]*\.html` ]
 				then
 					found=1
 				fi
@@ -637,7 +637,7 @@ else
 			then
 				novolume=0
 				url=`echo $word | cut -d \" -f 2 | cut -d \" -f 1`
-				if [ `echo $url | grep -E //mangafox\.me/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
+				if [ `echo $url | grep -E //fanfox\.net/manga/[^/]*/c[^/]*/[0-9]*\.html` ]
 				then
 					novolume=1
 					chapternum=`echo $url | cut -d / -f 6 | cut -d c -f 2`
@@ -647,7 +647,7 @@ else
 					chapternum=`echo $url | cut -d / -f 7 | cut -d c -f 2`
 					pagenum=`echo $url | cut -d / -f 8 | cut -d . -f 1`
 				fi
-				mangafox_download_chapter
+				fanfox_download_chapter
 			fi
 		done
 		rm -f temporary.html
