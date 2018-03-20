@@ -443,6 +443,14 @@ function fanfox_download_chapter()
 		then
 			curlreturn=1
 		fi
+		if [ `grep "503 Service Temporarily Unavailable" temporary.html | wc -l` -ne 0 ]
+		then
+			curlreturn=1
+		fi
+		if [ `grep "504 Gateway Time-out" temporary.html | wc -l` -ne 0 ]
+		then
+			curlreturn=1
+		fi
 		if [ $curlreturn -eq 0 ]
 		then
 			$imgurl_get
