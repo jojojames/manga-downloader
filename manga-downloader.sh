@@ -102,7 +102,7 @@ function base_manganame_chapternum_pagenum_downloader()
 
 	while [ true ]
 	do
-		url="http://$base/$manganame/$chapternum/$pagenum"
+		url="https://$base/$manganame/$chapternum/$pagenum"
 		rm -f temporary.html
 		download $url "temporary.html"
 		if [ $curlreturn -ne 0 ]
@@ -115,7 +115,7 @@ function base_manganame_chapternum_pagenum_downloader()
 		cd chapter-$chapternum
 		while [ $curlreturn -eq 0 ]
 		do
-			url="http://$base/$manganame/$chapternum/$pagenum"
+			url="https://$base/$manganame/$chapternum/$pagenum"
 			rm -f temporary.html
 			download $url "temporary.html"
 			if [ $curlreturn -eq 0 ]
